@@ -1,0 +1,63 @@
+version: '2'
+services:
+  mariadb:
+    ports:
+     - "3306:3306"
+    environment:
+     - MYSQL_ROOT_PASSWORD=itl130909
+    volumes:
+     - ./mariadb:/var/lib/mysql
+    expose:
+     - "3306"
+    image: "mariadb"
+  node1:
+    build: ./dockerfile/node
+    ports: 
+     - "8080"
+    links:
+     - mariadb:db
+     - redis:redis
+    volumes:
+     - ./web:/home/kimpus/web
+    expose:
+    - "8080"
+    #container_name: "node1"
+    command: "node /home/kimpus/web/app.js"
+    container_name: "kimpus_node1"
+  node2:
+      build: ./dockerfile/node
+      ports:
+       - "8080"
+      links:
+       - mariadb:db
+       - redis:redis
+      volumes:
+       - ./web:/home/kimpus/web
+      expose:
+      - "8080"
+      #container_name: "node1"
+      command: "node /home/kimpus/web/app.js"
+      container_name: "kimpus_node2"
+  redis:
+    ports:
+     - "6379:6379"
+    image: "redis"
+    expose:
+     - "6379"
+    container_name: "kimpus_redis"
+  nginx:
+    build: ./dockerfile/nginx/
+    links:
+     - node1:node1
+     - node2:node2
+    ports:
+     - "80:80"
+     - "443:443"
+    volumes:
+     - ./nginx/html:/usr/share/nginx/html
+     - ./nginx/config:/etc/nginx
+    expose:
+     - "80"
+    command: ./entrypoint.sh
+    container_name: "kimpus_nginx"
+
