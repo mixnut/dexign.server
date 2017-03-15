@@ -1,8 +1,7 @@
 var express = require('express');
-var http = require('http');
 var path = require('path');
 var router = require('./router/main');
-var app = express();
+var bodyParser = require('body-parser');
 var redis = require('redis');
 //fs = require("fs");
 
@@ -22,11 +21,39 @@ var client = redis.createClient('6379', 'redis');
 //     });
 //     client.quit();
 // });
-
+var app = express();
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 app.set('port',process.env.PORT || 8080);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', router);
 app.use('/test', router);
+
+
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
+});
 
 module.exports = app;
 var server = app.listen(app.get('port'), function(){
