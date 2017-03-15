@@ -9,8 +9,8 @@ var pool = mysql.createPool({
     host : "db",
     port : 3306,
     user : "root",
-    password : "itl130909",
-    database : "kimpus"
+    password : "dexign1234",
+    database : "dexign"
 });
   // Dexign
 module.exports = pool;

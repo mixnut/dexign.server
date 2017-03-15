@@ -4,7 +4,7 @@ services:
     ports:
      - "3306:3306"
     environment:
-     - MYSQL_ROOT_PASSWORD=itl130909
+     - MYSQL_ROOT_PASSWORD=dexign1234
     volumes:
      - ./mariadb:/var/lib/mysql
     expose:
@@ -18,12 +18,12 @@ services:
      - mariadb:db
      - redis:redis
     volumes:
-     - ./web:/home/kimpus/web
+     - ./web:/home/ubuntu/Dexign_Web/web
     expose:
     - "8080"
     #container_name: "node1"
-    command: "node /home/kimpus/web/app.js"
-    container_name: "kimpus_node1"
+    command: "node /home/ubuntu/Dexign_Web/web/app.js"
+    container_name: "dexign_node1"
   node2:
       build: ./dockerfile/node
       ports:
@@ -32,19 +32,19 @@ services:
        - mariadb:db
        - redis:redis
       volumes:
-       - ./web:/home/kimpus/web
+       - ./web:/home/ubuntu/Dexign_Web/web
       expose:
       - "8080"
       #container_name: "node1"
-      command: "node /home/kimpus/web/app.js"
-      container_name: "kimpus_node2"
+      command: "node /home/ubuntu/Dexign_Web/web/app.js"
+      container_name: "dexign_node2"
   redis:
     ports:
      - "6379:6379"
     image: "redis"
     expose:
      - "6379"
-    container_name: "kimpus_redis"
+    container_name: "dexign_redis"
   nginx:
     build: ./dockerfile/nginx/
     links:
@@ -59,5 +59,5 @@ services:
     expose:
      - "80"
     command: ./entrypoint.sh
-    container_name: "kimpus_nginx"
+    container_name: "dexign_nginx"
 
