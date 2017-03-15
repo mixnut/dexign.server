@@ -26,6 +26,7 @@ var client = redis.createClient('6379', 'redis');
 app.set('port',process.env.PORT || 8080);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', router);
+app.use('/test', router);
 
 module.exports = app;
 var server = app.listen(app.get('port'), function(){

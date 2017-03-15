@@ -5,7 +5,7 @@ var express = require('express');
 var router = express.Router();
 var controller = require("../controller");
 
-router.get("/", function (req, res) {
+router.get("/test", function (req, res) {
     controller.search(req,res)
 });
 

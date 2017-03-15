@@ -6,8 +6,7 @@
     "ejs": "~2.4.1",
     "body-parser": "~1.14.2",
     "express-session": "~1.13.0",
-    "node-gyp": "^3.4.0",
-    "mariasql": "0.2.6",
+    "mysql": "2.13.0",
     "redis": "2.6.4"
   }
 }
