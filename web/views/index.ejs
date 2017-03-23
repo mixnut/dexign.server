@@ -75,7 +75,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: 'https://my.protopie.io/v1/users/whoami',
+                    url: 'https://my.dexign.us/v1/users/whoami',
                     xhrFields: {withCredentials: true},
                     success : function() {
                         $("#header ._removeEl").remove();
@@ -93,7 +93,7 @@
                 if (url.search("/docs/") !== -1) {
                     var lang = url.split("/docs/")[1].split("/").filter(function(v){return v!==''})[0];
                     language.indexOf(lang) === -1 ? lang = "en" : lang;
-                    $.cookie("lang", lang, {expires : 30, path : "/", domain: "protopie.io"});
+                    $.cookie("lang", lang, {expires : 30, path : "/", domain: "dexign.us"});
                 }
 
                 $("._docsStudio").attr("href", "/docs/" + (($.cookie("lang") !== 'en' && $.cookie("lang") !== undefined) ? $.cookie("lang") : ""));
@@ -118,8 +118,8 @@
         <div class="sec gr">
             <div class="container">
                 <div class="tx_top">
-                    <video autoplay="" loop="" muted="" playsinline="" poster="/asset/image/hero_poster.png">
-                        <source src="/asset/image/pp_hero.mp4" type="video/mp4">
+                    <video autoplay="" loop="" muted="" playsinline="" poster="/asset/image/blank.png">
+                        <source src="/images/melon.mp4" type="video/mp4">
                     </video>
                     <h2>Realize <br class="mb_br">your thoughts<br>With DeXign,<br>It is done as you think.</h2>
                     <p>To explain your designs, you don’t need<br class="mb_br"> to do what the engineers do.<br> Instead of writing code, you can<br class="mb_br"> compose interactions by combining<br class="mb_br"> Interaction Pieces together.<br> Your interactions will result in faster and<br class="mb_br"> more efficient communication<br> between designers and engineers.</p>
