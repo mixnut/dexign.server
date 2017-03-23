@@ -3520,7 +3520,8 @@ strong {
   .mainHeader .btns {
     margin-bottom: 48px; }
   .main .tx_top {
-    padding-top: 57%;
+    padding-top: 47%;
+    padding-bottom: 47%;
     background: url(../image/bg_hero_mobile.png) no-repeat;
     background-size: 100%; }
   .main .tx_top video {
