@@ -3,6 +3,8 @@ var path = require('path');
 var router = require('./router/main');
 var bodyParser = require('body-parser');
 var redis = require('redis');
+var admin = require("firebase-admin");
+var serviceAccount = require("./firebase/serviceAccountKey.json");
 //fs = require("fs");
 
 var client = redis.createClient('6379', 'redis');
@@ -21,6 +23,12 @@ var client = redis.createClient('6379', 'redis');
 //     });
 //     client.quit();
 // });
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://dexign-7dea4.firebaseio.com"
+});
+console.log(admin.app().name);
+
 var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -28,7 +36,6 @@ app.set('port',process.env.PORT || 8080);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', router);
 app.use('/test', router);
-
 
 app.use(function(req, res, next) {
     var err = new Error('Not Found');

@@ -1,0 +1,26 @@
+.stack {
+    display: block;
+    font-size: 0;
+    transition: opacity 350ms;
+}
+
+.stack > div {
+    position: relative;
+    margin: 200px 0 200px 0;
+    text-align: center;
+}
+
+#img-header {
+    width: 500px;
+    height: 193px;
+}
+
+#img-bottom {
+    width: 321px;
+    height: 50px;
+}
+
+#video {
+    width: 640px;
+    height: 360px;
+}
