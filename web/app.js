@@ -3,39 +3,20 @@ var path = require('path');
 var router = require('./router/main');
 var bodyParser = require('body-parser');
 var redis = require('redis');
-var admin = require("firebase-admin");
-var serviceAccount = require("./firebase/serviceAccountKey.json");
-//fs = require("fs");
-
 var client = redis.createClient('6379', 'redis');
-
-// client.on("error", function (err) {
-//     console.log("Error " + err);
-// });
-//
-// client.set("string key", "string val", redis.print);
-// client.hset("hash key", "hashtest 1", "some value", redis.print);
-// client.hset(["hash key", "hashtest 2", "some other value"], redis.print);
-// client.hkeys("hash key", function (err, replies) {
-//     console.log(replies.length + " replies:");
-//     replies.forEach(function (reply, i) {
-//         console.log("    " + i + ": " + reply);
-//     });
-//     client.quit();
-// });
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://dexign-7dea4.firebaseio.com"
-});
-console.log(admin.app().name);
-
 var app = express();
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.set('port',process.env.PORT || 8080);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+
 app.use('/', router);
 app.use('/test', router);
+app.use('/files', router);
+app.use('/user', router);
 
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
@@ -68,3 +49,17 @@ var server = app.listen(app.get('port'), function(){
 });
 
 
+// client.on("error", function (err) {
+//     console.log("Error " + err);
+// });
+//
+// client.set("string key", "string val", redis.print);
+// client.hset("hash key", "hashtest 1", "some value", redis.print);
+// client.hset(["hash key", "hashtest 2", "some other value"], redis.print);
+// client.hkeys("hash key", function (err, replies) {
+//     console.log(replies.length + " replies:");
+//     replies.forEach(function (reply, i) {
+//         console.log("    " + i + ": " + reply);
+//     });
+//     client.quit();
+// });
