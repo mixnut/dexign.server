@@ -3,22 +3,56 @@
  */
 
 var pool = require("../lib/db_pool");
+var mysql = require("mysql");
 
 exports.search = function(req,res){
-
-    pool.getConnection(function(err,connection){
+    pool.getConnection(function(err,conn){
         if (err) {
-            connection.release();
+            conn.release();
             return;
         }
-        connection.query("select * from test",function(err,rows){
-            connection.release();
+        conn.query("select * from test",function(err,rows){
+            conn.release();
             if(!err) {
                 res.json(rows);
             }
         });
-        connection.on('error', function(err) {
-            connection.release();
+        conn.on('error', function(err) {
+            conn.release();
+            return;
+        });
+    });
+};
+
+exports.insertUser = function(res, name,email,uid,GUID,role, createDate){
+    pool.getConnection(function(err,conn){
+        if (err) {
+            console.log(err);
+            conn.release();
+            return;
+        }
+        var sql = [
+            "INSERT INTO user SET ",
+            "name=?",
+            ",email=?",
+            ",uid=?",
+            ",GUID=?",
+            ",role=?",
+            ",status=?",
+            ",createDate=?"
+            ].join('');
+        var param = [name,email,uid,GUID,role,"ready",createDate];
+        sql = mysql.format(sql,param);
+        console.log(sql);
+        conn.query(sql,function(err,result){
+            conn.release();
+            if(!err) {
+                res.json("{status:ready, uid:"+uid+"}");
+            }
+        });
+        conn.on('error', function(err) {
+            console.log(err);
+            conn.release();
             return;
         });
     });

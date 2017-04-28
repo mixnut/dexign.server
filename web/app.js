@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var router = require('./router/main');
 var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
 var redis = require('redis');
 var client = redis.createClient('6379', 'redis');
 var app = express();
@@ -10,12 +11,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.set('port',process.env.PORT || 8080);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(methodOverride());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.use('/', router);
 app.use('/test', router);
 app.use('/files', router);
+app.use('/signup', router);
 app.use('/user', router);
 
 app.use(function(req, res, next) {
