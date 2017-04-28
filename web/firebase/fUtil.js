@@ -1,7 +1,7 @@
 var firebase = require("firebase");
 const controller = require("../controller");
 
-var config = require('../auth/serviceAccountKeyForClient.json');;
+var config = require('../key/serviceAccountKeyForClient.json');;
 const dexign_app = firebase.initializeApp(config);
 const db = dexign_app.database();
 const auth = dexign_app.auth();

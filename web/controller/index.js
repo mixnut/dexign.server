@@ -47,7 +47,7 @@ exports.insertUser = function(res, name,email,uid,GUID,role, createDate){
         conn.query(sql,function(err,result){
             conn.release();
             if(!err) {
-                res.json("{status:ready, uid:"+uid+"}");
+                res.json("{status:ready}");
             }
         });
         conn.on('error', function(err) {
