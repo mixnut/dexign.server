@@ -20,6 +20,8 @@ app.use('/test', router);
 app.use('/files', router);
 app.use('/signup', router);
 app.use('/user', router);
+app.use('/project', router);
+app.use('/password', router);
 
 app.use(function(req, res, next) {
     var err = new Error('Not Found');

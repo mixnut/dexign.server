@@ -4,7 +4,7 @@
 
 var config = {
     projectId: 'dexign-7dea4',
-    credentials: require('../auth/serviceAccountKey.json')
+    credentials: require('../key/serviceAccountKey.json')
 };
 var storage = require('@google-cloud/storage')(config);
 var bucket = storage.bucket('dexign-7dea4.appspot.com');

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@google-cloud/storage": "^1.1.0",
+    "async": "^2.4.0",
     "body-parser": "~1.14.2",
     "ejs": "~2.4.1",
     "express": "~4.13.1",
