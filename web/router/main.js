@@ -13,15 +13,19 @@ router.get('/', function (req, res, next) {
 });
 router.route('/test')
     .get(function (req, res, next) {
-        res.json('{success:get'+next+'}');
+        res.json({success:'get'+next});
     })
     .post(function (req, res, next) {
-        res.json('{success:post'+next+'}');
+        res.json({success:'post'+next});
     });
+router.get('/debug/delete', function (req, res, next) {
+    fUtil.deleteUserRef();
+    controller.deleteAll(res);
+});
 
 router.route('/user')
     .get(function (req, res, next) {
-        res.json('{success:'+next+'}');
+        res.json({status:"success", data:{status:''+next}});
     })
     .post(function (req, res, next) {
         fUtil.createUser(req.body.email,req.body.password,req.body.userName,req.body.GUID,req.body.role,res);
@@ -32,7 +36,7 @@ router.route('/user')
                 fUtil.deleteUser(res,req.body.uid);
             }
             else{
-                res.json('{status:error, message:'+err+'}');
+                res.json({status:"success", data:{status:"failed"}, message:err.message});
             }
         });
     });
@@ -41,37 +45,42 @@ router.route('/user')
 router.post("/signup", function (req,res){
     fUtil.auth.signInWithEmailAndPassword(req.body.email, req.body.password)
         .then(function(user) {
-            var uid = user.uid;
+            var _uid = user.uid;
             if(user.emailVerified){
-                controller.checkToken(uid, function(err,result){
+                controller.checkToken(_uid, function(err,result){
                     if(!err){
-                        if(result=='live') {
-                            res.json('{status:live, uid:'+uid+'}');
+                        if(result=='success') {
+                            controller.getUserName(_uid,function(err,result){
+                                res.json({status:"success", data:{status:"success", uid:_uid, username:result}});
+                            });
                         }
-                        else if(result=='ready'){
-                            controller.updateUser(res, uid);
+                        else if(result=='pending'){
+                            controller.getUserName(_uid,function(err,result){
+                                controller.updateUser(res, _uid, result);
+                            });
+
                         }
                         else{
-                            res.json('{status:deleted, uid:'+uid+'}');
+                            res.json({status:"success", data:{status:"deleted"}});
                         }
                     }
                     else{
-                        res.json('{status:error, message:'+err+'}');
+                        res.json({status:"success", data:{status:"failed"}, message:err.message});
                     }
                 });
             }else{
-                res.json('{status: ready}');
+                res.json({status:"success", data:{status: "pending", uid:_uid}});
             }
         })
-        .catch(function(error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            if (errorCode === 'auth/wrong-password') {
-                res.json('{status:error, message: wrong passwrod}');
+        .catch(function(err) {
+            // Handle errs here.
+            var errCode = err.code;
+            if (errCode === 'auth/wrong-password') {
+                res.json({status:"success", data:{status:"failed"}, message:err.message});
             } else {
-                res.json('{status:error, message:'+error+'}');
+                res.json({status:"success", data:{status:"failed"}, message:err.message});
             }
-            console.log(error);
+            console.log(err);
         });
 });
 
@@ -81,10 +90,10 @@ router.put("/password", function (req,res){
 
 router.route('/project')
     .get(function (req, res, next) {
-        res.json('{success:'+next+'}');
+        res.json({status:"success", data:{status:''+next}});
     })
     .post(function (req, res, next) {
-        controller.insertProject(res, req.body.projectName, req.body.packageName, req.body.version, req.body.uid ,req.body.GUID, req.body.bucketUsage, "live", new Date().toISOString().slice(0,10));
+        controller.insertProject(res, req.body.projectName, req.body.packageName, req.body.version, req.body.uid ,req.body.GUID, req.body.bucketUsage, "success", new Date().toISOString().slice(0,10));
     });
 
 router.route('/files/:filetype')
@@ -102,15 +111,15 @@ router.route('/files/:filetype')
         fUtil.fileRef(req.params.filetype).push().set({
             filename : req.file.cloudStorageObject,
             url : req.file.cloudStoragePublicUrl
-        }, function(error) {
-            if (error) {
-                res.json('{status:error, message:'+error+'}')
+        }, function(err) {
+            if (err) {
+                res.json({status:"success", data:{status:"failed"}, message:err.message});
             } else {
-                res.json('{success:Data saved successfully}')
+                res.json({status:"success", message:"Data saved successfully"})
             }
         });
     }else{
-        res.json("{status:error, message:not found file")
+        res.json({status:"failed", message:"not found file"})
     }
     });
 

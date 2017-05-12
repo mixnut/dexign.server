@@ -35,6 +35,36 @@ exports.checkToken = function(uid, callback){
     });
 };
 
+exports.getUserName = function(uid, callback){
+    pool.getConnection(function(err,conn){
+        if (err) {
+            conn.release();
+            return;
+        }
+        var sql = "SELECT name FROM user WHERE uid=?"
+        var param = [uid];
+        sql = mysql.format(sql,param);
+        conn.query(sql,function(err,results){
+            conn.release();
+            if(err) {
+                callback(err,null);
+            }else{
+                if(results.length > 0){
+                    callback(null,results[0].name);
+                }else{
+                    callback(null,null);
+                }
+
+            }
+        });
+        conn.on('error', function(err) {
+            callback(err,null);
+            conn.release();
+            return;
+        });
+    });
+};
+
 exports.insertUser = function(res, name, email, uid, GUID, role, createDate){
     pool.getConnection(function(err,conn){
         if (err) {
@@ -52,7 +82,7 @@ exports.insertUser = function(res, name, email, uid, GUID, role, createDate){
             ",status=?",
             ",createDate=?; "
             ].join('');
-        var param1 = [name,email,uid,GUID,role,"ready",createDate];
+        var param1 = [name,email,uid,GUID,role,"pending",createDate];
         sql1 = mysql.format(sql1,param1);
 
         var sql2 = [
@@ -61,7 +91,7 @@ exports.insertUser = function(res, name, email, uid, GUID, role, createDate){
             ",status=?",
             ",createDate=?;"
         ].join('');
-        var param2 = [uid,"ready",createDate];
+        var param2 = [uid,"pending",createDate];
         sql2 = mysql.format(sql2,param2);
 
         var sql3;
@@ -80,7 +110,7 @@ exports.insertUser = function(res, name, email, uid, GUID, role, createDate){
         conn.query(sql1+sql2+sql3, [1,2],function(err,result){
             conn.release();
             if(!err) {
-                res.json("{status:ready}");
+                res.json({status:"success", data:{status:"pending"}});
             }
         });
         conn.on('error', function(err) {
@@ -91,7 +121,7 @@ exports.insertUser = function(res, name, email, uid, GUID, role, createDate){
     });
 };
 
-exports.updateUser = function(res, uid){
+exports.updateUser = function(res, _uid, _userName){
     pool.getConnection(function(err,conn){
         if (err) {
             console.log(err);
@@ -100,24 +130,24 @@ exports.updateUser = function(res, uid){
         }
         var sql1 = [
             "UPDATE user SET ",
-            "status='live' ",
+            "status='success' ",
             "WHERE ",
             "uid=?; "
         ].join('');
-        var param1 = [uid];
+        var param1 = [_uid];
         sql1 = mysql.format(sql1,param1);
         var sql2 = [
             "UPDATE token SET ",
-            "status='live' ",
+            "status='success' ",
             "WHERE ",
             "token=?;"
         ].join('');
-        var param2 = [uid];
+        var param2 = [_uid];
         sql2 = mysql.format(sql2,param2);
         conn.query(sql1+sql2, [1,2], function(err,result){
             conn.release();
             if(!err) {
-                res.json('{status:live, uid:'+uid+'}');
+                res.json({status:"success", data:{status:"success", uid:_uid, username:_userName}});
             }
         });
         conn.on('error', function(err) {
@@ -164,7 +194,7 @@ exports.deleteUser = function(res, uid){
         conn.query(sql1+sql2+sql3, [1,2,3], function(err,result){
             conn.release();
             if(!err) {
-                res.json('{status:deleted, uid:'+uid+'}');
+                res.json({status:"success"});
             }
         });
         conn.on('error', function(err) {
@@ -175,7 +205,7 @@ exports.deleteUser = function(res, uid){
     });
 };
 
-exports.insertProject = function(res, projectName, packageName, version, uid ,GUID, bucketUsage, status, createDate){
+exports.insertProject = function(res, projectName, packageName, version, uid ,_GUID, bucketUsage, status, createDate){
     pool.getConnection(function(err,conn){
         if (err) {
             console.log(err);
@@ -193,7 +223,7 @@ exports.insertProject = function(res, projectName, packageName, version, uid ,GU
             ",status=?",
             ",createDate=?;"
         ].join('');
-        var param1 = [projectName,packageName,version,uid,GUID,bucketUsage,"live",createDate];
+        var param1 = [projectName,packageName,version,uid,_GUID,bucketUsage,"success",createDate];
         sql1 = mysql.format(sql1,param1);
 
         var sql2 = [
@@ -202,7 +232,7 @@ exports.insertProject = function(res, projectName, packageName, version, uid ,GU
             ",GUID=?",
             ",role=?;"
         ].join('');
-        var param2 = [uid,GUID,"d"];
+        var param2 = [uid,_GUID,"d"];
         sql2 = mysql.format(sql2,param2);
 
         var sql3 = [
@@ -211,13 +241,40 @@ exports.insertProject = function(res, projectName, packageName, version, uid ,GU
             "WHERE ",
             "uid=?;"
         ].join('');
-        var param3 = [GUID,uid];
+        var param3 = [_GUID,uid];
         sql3 = mysql.format(sql3,param3);
 
         conn.query(sql1+sql2+sql3, [1,2],function(err,result){
             conn.release();
             if(!err) {
-                res.json("{status:success, GUID:"+GUID+"}");
+                res.json({status:"success", data:{GUID:_GUID}});
+            }
+        });
+        conn.on('error', function(err) {
+            console.log(err);
+            conn.release();
+            return;
+        });
+    });
+};
+
+
+exports.deleteAll = function(res){
+    pool.getConnection(function(err,conn){
+        if (err) {
+            console.log(err);
+            conn.release();
+            return;
+        }
+        var sql1 = "DELETE FROM apps;";
+        var sql2 = "DELETE FROM project;";
+        var sql3 = "DELETE FROM token;";
+        var sql4 = "DELETE FROM user;";
+
+        conn.query(sql1+sql2+sql3+sql4, [1,2,3,4],function(err,result){
+            conn.release();
+            if(!err) {
+                res.json({status:"success", data:{status:"delete all"}});
             }
         });
         conn.on('error', function(err) {

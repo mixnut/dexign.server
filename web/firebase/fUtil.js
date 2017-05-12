@@ -23,25 +23,27 @@ const createUser = function(_email,_password,_userName,_GUID,_role,res){
             dexign_app.auth().currentUser.sendEmailVerification()
                 .then(function(result){
                     var _createDate = new Date().toISOString().slice(0,10);
+
                     userRef().child(userRecord.uid).set({
                         userName: _userName,
                         createDate:  _createDate
-                    }, function(error) {
-                        if (error) {
-                            res.json("{status:error, message:"+error+"}");
+                    }, function(err) {
+                        if (err) {
+                            res.json({status:"failed", message:err.message});
                         } else {
                             controller.insertUser(res, _userName,_email,userRecord.uid,_GUID,_role,_createDate);
                         }
                     });
+
                 },function(err){
-                    res.json("{status:error, message:"+error+"}");
+                    res.json({status:"failed", message:err.message});
                 });
         })
-        .catch(function(error) {
-            if(error.code=='auth/email-already-in-use'){
-                res.json('{status:already-in-use}');
+        .catch(function(err) {
+            if(err.code=='auth/email-already-in-use'){
+                res.json({status:"success", data:{status:"already-in-use"}});
             }else{
-                res.json("{status:error, message:"+error+"}");
+                res.json({status:"failed", message:err.message});
             }
         });
 }
@@ -51,17 +53,20 @@ const deleteUser = function(res, uid){
             userRef().child(uid).remove();
             controller.deleteUser(res, uid);
         })
-        .catch(function(error) {
-            res.json("{status:error, message:"+error+"}");
+        .catch(function(err) {
+            res.json({status:"failed", message:err.message});
         });
+}
+const deleteUserRef = function(){
+    userRef().remove();
 }
 const resetPassword = function(_email,res){
     dexign_app.auth().sendPasswordResetEmail(_email)
         .then(function() {
-            res.json("{status:success, message:send password reset email}");
+            res.json({status:"success", message:"send password reset email"});
         })
-        .catch(function(error) {
-                res.json("{status:error, message:"+error+"}");
+        .catch(function(err) {
+            res.json({status:"success", data:{status:"failed"}, message:err.message});
         });
 }
 module.exports = {
@@ -72,5 +77,6 @@ module.exports = {
     userRef,
     createUser,
     deleteUser,
+    deleteUserRef,
     resetPassword
 };
