@@ -20,6 +20,7 @@ app.use('/test', router);
 app.use('/files', router);
 app.use('/signup', router);
 app.use('/user', router);
+app.use('/user/validation', router);
 app.use('/project', router);
 app.use('/password', router);
 app.use('/debug/delete', router);

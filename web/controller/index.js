@@ -28,7 +28,6 @@ exports.checkToken = function(uid, callback){
             }
         });
         conn.on('error', function(err) {
-            callback(err,null);
             conn.release();
             return;
         });
@@ -58,7 +57,6 @@ exports.getUserName = function(uid, callback){
             }
         });
         conn.on('error', function(err) {
-            callback(err,null);
             conn.release();
             return;
         });

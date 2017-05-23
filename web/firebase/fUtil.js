@@ -15,7 +15,10 @@ const fileRef = function(filetype){
     return db.ref('/'+filetype);
 }
 const userRef = function(){
-    return db.ref('user/');
+    return db.ref('users/');
+}
+const projectsRef = function(uid,guid){
+    return userRef().child(uid).child('projects/').child(guid);
 }
 const createUser = function(_email,_password,_userName,_GUID,_role,res){
     dexign_app.auth().createUserWithEmailAndPassword(_email,_password)
@@ -75,6 +78,7 @@ module.exports = {
     db,
     fileRef,
     userRef,
+    projectsRef,
     createUser,
     deleteUser,
     deleteUserRef,

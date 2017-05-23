@@ -41,6 +41,20 @@ router.route('/user')
         });
     });
 
+router.post("/user/validation", function (req,res) {
+    controller.checkToken(req.body.uid, function(err,result){
+        if(!err){
+            console.log(result);
+            if(result=="success")
+                res.json({status:"success"});
+            else
+                res.json({status:"success", data:{status:"failed"}});
+        }
+        else{
+            res.json({status:"success", data:{status:"failed"}, message:err.message});
+        }
+    });
+});
 
 router.post("/signup", function (req,res){
     fUtil.auth.signInWithEmailAndPassword(req.body.email, req.body.password)
@@ -65,7 +79,7 @@ router.post("/signup", function (req,res){
                         }
                     }
                     else{
-                        res.json({status:"success", data:{status:"failed"}, message:err.message});
+                        res.json({status:"success", data:{status:"failed"}});
                     }
                 });
             }else{
@@ -93,7 +107,20 @@ router.route('/project')
         res.json({status:"success", data:{status:''+next}});
     })
     .post(function (req, res, next) {
-        controller.insertProject(res, req.body.projectName, req.body.packageName, req.body.version, req.body.uid ,req.body.GUID, req.body.bucketUsage, "success", new Date().toISOString().slice(0,10));
+        var _projectName = req.body.projectName;
+        var _version = req.body.version;
+        var _createDate = new Date().toISOString().slice(0,10);
+        fUtil.projectsRef(req.body.uid, req.body.GUID).update({
+            projectName: _projectName,
+            version: _version,
+            createDate: _createDate
+        }, function(err) {
+            if (err) {
+                res.json({status:"failed", message:err.message});
+            } else {
+                controller.insertProject(res, _projectName, req.body.packageName, _version, req.body.uid ,req.body.GUID, req.body.bucketUsage, "success", _createDate);
+            }
+        });
     });
 
 router.route('/files/:filetype')
