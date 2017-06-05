@@ -48,10 +48,10 @@ router.post("/user/validation", function (req,res) {
             if(result=="success")
                 res.json({status:"success"});
             else
-                res.json({status:"success", data:{status:"failed"}});
+                res.json({status:"failed"});
         }
         else{
-            res.json({status:"success", data:{status:"failed"}, message:err.message});
+            res.json({status:"failed", message:err.message});
         }
     });
 });
@@ -135,14 +135,15 @@ router.route('/files/:filetype')
     let data = req.body;
 
     if (req.file && req.file.cloudStoragePublicUrl) {
+        var _url = req.file.cloudStoragePublicUrl;
         fUtil.fileRef(req.params.filetype).push().set({
             filename : req.file.cloudStorageObject,
-            url : req.file.cloudStoragePublicUrl
+            url : _url
         }, function(err) {
             if (err) {
                 res.json({status:"success", data:{status:"failed"}, message:err.message});
             } else {
-                res.json({status:"success", message:"Data saved successfully"})
+                res.json({status:"success", data:{url:_url}, message:"Data saved successfully"})
             }
         });
     }else{

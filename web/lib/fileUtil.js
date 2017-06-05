@@ -14,6 +14,7 @@ var bucket = storage.bucket('dexign-7dea4.appspot.com');
 // The object's ACL has to be set to public read.
 // [START public_url]
 function getPublicUrl (filename) {
+    bucket.file(filename).makePublic();
     return `https://storage.googleapis.com/dexign-7dea4.appspot.com/${filename}`;
 }
 // [END public_url]
