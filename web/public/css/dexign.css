@@ -1589,11 +1589,30 @@ strong {
 .right {
   right: 0; }
 
+.bg_imagine {
+  right: 0;
+  height: 65%;
+  background: url(../images/imagine.png) no-repeat 100% 0;
+  background-size: 100% 100%;
+}
+.bg_cross {
+  right: 0;
+  height: 50%;
+  background: url(../images/cross.png) no-repeat 100% 0;
+  background-size: 100% 100%;
+}
+.bg_scrollview {
+  left: 0;
+  height: 80%;
+  background: url(../images/scrollview.png) no-repeat;
+  background-size: auto 100%
+}
 .bg_pinch {
   right: 0;
-  height: 491px;
-  background: url(../image/bg_mobile.png) no-repeat 100% 0;
-  background-size: 245px auto; }
+  height: 50%;
+  background: url(../images/mac.png) no-repeat 100% 0;
+  background-size: 100% 100%;
+}
 
 .bg_pinch .animation_wrap {
   overflow: hidden;
@@ -1725,9 +1744,9 @@ strong {
 
 .bg_sound {
   left: 0;
-  height: 491px;
-  background: url(../image/bg_sound.png) no-repeat;
-  background-size: 455px 491px; }
+  height: 90%;
+  background: url(../images/instagram.png) no-repeat;
+  background-size: 74% 100% }
 
 .bg_sound .animation_wrap {
   overflow: hidden;
@@ -2294,7 +2313,7 @@ strong {
   text-align: center; }
 
 .gr {
-  background-color: #E5E7E8; }
+  background-color: #F8F8FF; }
 
 .gr2 {
   background-color: #FAFBFC; }
