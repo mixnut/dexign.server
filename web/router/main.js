@@ -123,6 +123,38 @@ router.route('/project')
         });
     });
 
+router.route('/lambdas')
+    .post(function (req, res, next) {
+        controller.insertLambda(res, req.body.email, req.body.name, req.body.code, req.body.parameters, new Date().toISOString().slice(0,10));
+    })
+    .put(function (req, res, next) {
+        controller.updateLambda(res, req.body.email, req.body.name, req.body.code,req.body.parameters);
+    })
+    .delete(function (req, res, next) {
+        controller.deleteLambda(res, req.body.email, req.body.name);
+    });
+router.route('/lambda/:email/:name')
+    .post(function (req, res, next) {
+        controller.readLambda(req.params.email, req.params.name, function(err,results){
+            if(!err){
+                eval(results[0].code);
+                var name = results[0].name;
+                var parameters = (results[0].parameters).split(",");
+                var bodyParams = req.body;
+                var executeCode=name+"(";
+                for(var i=0; i<parameters.length; i++) {
+                    if(i==parameters.length-1)
+                        executeCode += bodyParams[parameters[i]];
+                    else
+                        executeCode += bodyParams[parameters[i]]+',';
+                }
+                res.send(eval(executeCode+")")+'')
+            }
+            else{
+                res.json({status:"faild"});
+            }
+        });
+    });
 router.route('/files/:filetype')
     .get(function (req, res) {
         fUtil.fileRef(req.params.filetype).once("value", function(snapshot) {

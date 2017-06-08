@@ -23,12 +23,17 @@ app.use('/user', router);
 app.use('/user/validation', router);
 app.use('/project', router);
 app.use('/password', router);
+app.use('/lambda', router);
+app.use('/lambdas', router);
 app.use('/debug/delete', router);
 
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
-    next(err);
+    res.render('error', {
+        message: err.message,
+        error: err
+    });
 });
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {

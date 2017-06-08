@@ -256,6 +256,141 @@ exports.insertProject = function(res, projectName, packageName, version, uid ,_G
     });
 };
 
+exports.insertLambda = function(res, email, name, code, parameters, createDate){
+    pool.getConnection(function(err,conn){
+        if (err) {
+            console.log(err);
+            conn.release();
+            return;
+        }
+        var sql = [
+            "INSERT INTO lambda SET ",
+            "email=?",
+            ",name=?",
+            ",code=?",
+            ",parameters=?",
+            ",createDate=? ",
+            "ON DUPLICATE KEY UPDATE ",
+            "email=?",
+            ",name=?",
+            ",code=?",
+            ",parameters=?",
+            ",createDate=?;"
+        ].join('');
+        var param = [email,name,code,parameters,createDate,email,name,code,parameters,createDate];
+        sql = mysql.format(sql,param);
+
+        conn.query(sql ,function(err,result){
+            conn.release();
+            if(!err) {
+                res.json({status:"success"});
+            }
+        });
+        conn.on('error', function(err) {
+            console.log(err);
+            conn.release();
+            return;
+        });
+    });
+};
+exports.updateLambda = function(res, email, name, code, parameters){
+    pool.getConnection(function(err,conn){
+        if (err) {
+            console.log(err);
+            conn.release();
+            return;
+        }
+        var sql = [
+            "UPDATE lambda SET ",
+            "code=?, ",
+            "parameters=? ",
+            "WHERE ",
+            "email=? ",
+            "AND ",
+            "name=?;"
+        ].join('');
+        var param = [code,parameters,email,name];
+        sql = mysql.format(sql,param);
+        conn.query(sql, function(err,result){
+            conn.release();
+            if(!err) {
+                res.json({status:"success"});
+            }
+        });
+        conn.on('error', function(err) {
+            console.log(err);
+            conn.release();
+            return;
+        });
+    });
+};
+
+exports.deleteLambda = function(res, email, name){
+    pool.getConnection(function(err,conn){
+        if (err) {
+            console.log(err);
+            conn.release();
+            return;
+        }
+        var sql = [
+            "DELETE FROM lambda ",
+            "WHERE ",
+            "email=? ",
+            "AND ",
+            "name=?;"
+        ].join('');
+        var param = [email,name];
+        sql = mysql.format(sql,param);
+
+        conn.query(sql, function(err,result){
+            conn.release();
+            if(!err) {
+                res.json({status:"success"});
+            }
+        });
+        conn.on('error', function(err) {
+            console.log(err);
+            conn.release();
+            return;
+        });
+    });
+};
+
+exports.readLambda = function(email, name, callback){
+    pool.getConnection(function(err,conn){
+        if (err) {
+            conn.release();
+            return;
+        }
+        var sql = [
+            "SELECT code,name,parameters FROM lambda ",
+            "WHERE ",
+            "email=? ",
+            "AND ",
+            "name=?;"
+        ].join('');
+        var param = [email,name];
+        sql = mysql.format(sql,param);
+
+        conn.query(sql,function(err,results){
+            conn.release();
+            if(err) {
+                callback(err,null);
+            }else{
+                if(results.length > 0){
+                    callback(null,results);
+                }else{
+                    callback(null,null);
+                }
+
+            }
+        });
+        conn.on('error', function(err) {
+            conn.release();
+            return;
+        });
+    });
+};
 
 exports.deleteAll = function(res){
     pool.getConnection(function(err,conn){
