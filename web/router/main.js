@@ -124,6 +124,9 @@ router.route('/project')
     });
 
 router.route('/lambdas')
+    .get(function (req, res, next) {
+        controller.listLambdas(res);
+    })
     .post(function (req, res, next) {
         controller.insertLambda(res, req.body.email, req.body.name, req.body.code, req.body.parameters, new Date().toISOString().slice(0,10));
     })

@@ -256,6 +256,28 @@ exports.insertProject = function(res, projectName, packageName, version, uid ,_G
     });
 };
 
+exports.listLambdas = function(res){
+
+    pool.getConnection(function(err,connection){
+        if (err) {
+            connection.release();
+            return;
+        }
+        connection.query("select * from lambda",function(err,rows){
+            connection.release();
+            if(!err) {
+                res.json(rows);
+            }else{
+                res.json({status:"failed"});
+            }
+        });
+        connection.on('error', function(err) {
+            connection.release();
+            return;
+        });
+    });
+};
+
 exports.insertLambda = function(res, email, name, code, parameters, createDate){
     pool.getConnection(function(err,conn){
         if (err) {
