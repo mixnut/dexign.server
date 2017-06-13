@@ -266,7 +266,11 @@ exports.listLambdas = function(res){
         connection.query("select * from lambda",function(err,rows){
             connection.release();
             if(!err) {
-                res.json(rows);
+                var array=[];
+                for(x in rows){
+                    array.push({seq:rows[x].seq, email:rows[x].email, name:rows[x].name, code:rows[x].code, parameters:rows[x].parameters, createDate:rows[x].createDate});
+                }
+                res.json({status:"success", data:array});
             }else{
                 res.json({status:"failed"});
             }
@@ -306,11 +310,13 @@ exports.insertLambda = function(res, email, name, code, parameters, createDate){
             conn.release();
             if(!err) {
                 res.json({status:"success"});
+            }else{
+                res.json({status:"faild", message:err.message});
             }
         });
         conn.on('error', function(err) {
-            console.log(err);
             conn.release();
+            res.json({status:"faild", message:err.message});
             return;
         });
     });

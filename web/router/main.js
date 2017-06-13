@@ -136,27 +136,34 @@ router.route('/lambdas')
     .delete(function (req, res, next) {
         controller.deleteLambda(res, req.body.email, req.body.name);
     });
+
+function readLambda(email, name, _variable, res){
+    controller.readLambda(email, name, function(err,results){
+        if(!err){
+            eval(results[0].code);
+            var name = results[0].name;
+            var parameters = (results[0].parameters).split(",");
+            var variable = _variable;
+            var executeCode=name+"(";
+            for(var i=0; i<parameters.length; i++) {
+                if(i==parameters.length-1)
+                    executeCode += variable[parameters[i]];
+                else
+                    executeCode += variable[parameters[i]]+',';
+            }
+            res.send(eval(executeCode+")")+'')
+        }
+        else{
+            res.json({status:"faild"});
+        }
+    });
+}
 router.route('/lambda/:email/:name')
+    .get(function (req, res, next) {
+        readLambda(req.params.email, req.params.name,req.query, res)
+    })
     .post(function (req, res, next) {
-        controller.readLambda(req.params.email, req.params.name, function(err,results){
-            if(!err){
-                eval(results[0].code);
-                var name = results[0].name;
-                var parameters = (results[0].parameters).split(",");
-                var bodyParams = req.body;
-                var executeCode=name+"(";
-                for(var i=0; i<parameters.length; i++) {
-                    if(i==parameters.length-1)
-                        executeCode += bodyParams[parameters[i]];
-                    else
-                        executeCode += bodyParams[parameters[i]]+',';
-                }
-                res.send(eval(executeCode+")")+'')
-            }
-            else{
-                res.json({status:"faild"});
-            }
-        });
+        readLambda(req.params.email, req.params.name,req.body, res)
     });
 router.route('/files/:filetype')
     .get(function (req, res) {
