@@ -140,18 +140,28 @@ router.route('/lambdas')
 function readLambda(email, name, _variable, res){
     controller.readLambda(email, name, function(err,results){
         if(!err){
-            eval(results[0].code);
-            var name = results[0].name;
-            var parameters = (results[0].parameters).split(",");
-            var variable = _variable;
-            var executeCode=name+"(";
-            for(var i=0; i<parameters.length; i++) {
-                if(i==parameters.length-1)
-                    executeCode += variable[parameters[i]];
-                else
-                    executeCode += variable[parameters[i]]+',';
+            if(results!=null) {
+                console.log(email+name+_variable)
+                console.log(results)
+                eval(results[0].code);
+                var name = results[0].name;
+                var parameters = (results[0].parameters).split(",");
+                var variable = _variable;
+                var executeCode = name + "(";
+                for (var i = 0; i < parameters.length; i++) {
+                    if (i == parameters.length - 1)
+                        executeCode += variable[parameters[i]];
+                    else
+                        executeCode += variable[parameters[i]] + ',';
+                }
+                try {
+                    res.send(eval(executeCode + ")") + '')
+                }catch(exception){
+                    res.json({status:"faild", message:"The function name of the argument differs from the function name of the code, or other exception conditions."});
+                }
+            }else{
+                res.json({status:"faild", message:"can not find the function."});
             }
-            res.send(eval(executeCode+")")+'')
         }
         else{
             res.json({status:"faild"});

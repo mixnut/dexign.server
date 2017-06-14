@@ -28,6 +28,7 @@ exports.checkToken = function(uid, callback){
             }
         });
         conn.on('error', function(err) {
+            console.log(err);
             conn.release();
             return;
         });
@@ -57,6 +58,7 @@ exports.getUserName = function(uid, callback){
             }
         });
         conn.on('error', function(err) {
+            console.log(err);
             conn.release();
             return;
         });
@@ -276,6 +278,7 @@ exports.listLambdas = function(res){
             }
         });
         connection.on('error', function(err) {
+            console.log(err);
             connection.release();
             return;
         });
@@ -315,8 +318,8 @@ exports.insertLambda = function(res, email, name, code, parameters, createDate){
             }
         });
         conn.on('error', function(err) {
+            console.log(err);
             conn.release();
-            res.json({status:"faild", message:err.message});
             return;
         });
     });
@@ -414,6 +417,7 @@ exports.readLambda = function(email, name, callback){
             }
         });
         conn.on('error', function(err) {
+            console.log(err);
             conn.release();
             return;
         });
