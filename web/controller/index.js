@@ -34,6 +34,35 @@ exports.checkToken = function(uid, callback){
         });
     });
 };
+exports.selectUidFromProject = function(GUID, callback){
+    pool.getConnection(function(err,conn){
+        if (err) {
+            conn.release();
+            return;
+        }
+        var sql = "SELECT uid FROM project WHERE GUID=?"
+        var param = [GUID];
+        sql = mysql.format(sql,param);
+        conn.query(sql,function(err,results){
+            conn.release();
+            if(err) {
+                callback(err,null);
+            }else{
+                if(results.length > 0){
+                    callback(null,results[0].uid);
+                }else{
+                    callback(null,null);
+                }
+
+            }
+        });
+        conn.on('error', function(err) {
+            console.log(err);
+            conn.release();
+            return;
+        });
+    });
+};
 
 exports.getUserName = function(uid, callback){
     pool.getConnection(function(err,conn){
@@ -111,6 +140,38 @@ exports.insertUser = function(res, name, email, uid, GUID, role, createDate){
             conn.release();
             if(!err) {
                 res.json({status:"success", data:{status:"pending"}});
+            }
+        });
+        conn.on('error', function(err) {
+            console.log(err);
+            conn.release();
+            return;
+        });
+    });
+};
+exports.insertUserForClient = function(res, name, email, uid, GUID, role, createDate){
+    pool.getConnection(function(err,conn){
+        if (err) {
+            console.log(err);
+            conn.release();
+            return;
+        }
+        var sql = [
+            "INSERT INTO user SET ",
+            "name=?",
+            ",email=?",
+            ",uid=?",
+            ",GUID=?",
+            ",role=?",
+            ",status=?",
+            ",createDate=?; "
+        ].join('');
+        var param = [name,email,uid,GUID,role,"success",createDate];
+        sql = mysql.format(sql,param);
+        conn.query(sql, function(err,result){
+            conn.release();
+            if(!err) {
+                res.json({status:"success", data:{status:"success"}});
             }
         });
         conn.on('error', function(err) {
@@ -235,16 +296,8 @@ exports.insertProject = function(res, projectName, packageName, version, uid ,_G
         var param2 = [uid,_GUID,"d"];
         sql2 = mysql.format(sql2,param2);
 
-        var sql3 = [
-            "UPDATE user SET ",
-            "GUID=? ",
-            "WHERE ",
-            "uid=?;"
-        ].join('');
-        var param3 = [_GUID,uid];
-        sql3 = mysql.format(sql3,param3);
 
-        conn.query(sql1+sql2+sql3, [1,2],function(err,result){
+        conn.query(sql1+sql2, [1,2],function(err,result){
             conn.release();
             if(!err) {
                 res.json({status:"success", data:{GUID:_GUID}});

@@ -21,34 +21,60 @@ const projectsRef = function(uid,guid){
     return userRef().child(uid).child('projects/').child(guid);
 }
 const createUser = function(_email,_password,_userName,_GUID,_role,res){
-    dexign_app.auth().createUserWithEmailAndPassword(_email,_password)
-        .then(function(userRecord) {
-            dexign_app.auth().currentUser.sendEmailVerification()
-                .then(function(result){
-                    var _createDate = new Date().toISOString().slice(0,10);
+        dexign_app.auth().createUserWithEmailAndPassword(_email, _password)
+            .then(function (userRecord) {
+                if(_role=='d') { //개발자가 dexign app 가입
+                    dexign_app.auth().currentUser.sendEmailVerification()
+                        .then(function (result) {
+                            var _createDate = new Date().toISOString().slice(0, 10);
 
-                    userRef().child(userRecord.uid).set({
-                        userName: _userName,
-                        createDate:  _createDate
-                    }, function(err) {
-                        if (err) {
+                            userRef().child(userRecord.uid).set({
+                                userName: _userName,
+                                createDate: _createDate
+                            }, function (err) {
+                                if (err) {
+                                    res.json({status: "failed", message: err.message});
+                                } else {
+                                    controller.insertUser(res, _userName, _email, userRecord.uid, _GUID, _role, _createDate);
+                                }
+                            });
+
+                        }, function (err) {
+                            res.json({status: "failed", message: err.message});
+                        });
+                }else{ //client 가입
+                    controller.selectUidFromProject(_GUID,function(err,result){
+                        if(!err){
+                            if(result!=null){
+                                var _createDate = new Date().toISOString().slice(0, 10);
+                                userRef().child(result).child('projects').child(_GUID).child('data').child('client').child(userRecord.uid)
+                                    .set({
+                                    userName: _userName,
+                                    createDate: _createDate
+                                }, function (err) {
+                                    if (err) {
+                                        res.json({status: "failed", message: err.message});
+                                    } else {
+                                        controller.insertUserForClient(res, _userName, _email, userRecord.uid, _GUID, _role, _createDate);
+                                    }
+                                });
+                            }
+                            else
+                                res.json({status:"failed"});
+                        }
+                        else{
                             res.json({status:"failed", message:err.message});
-                        } else {
-                            controller.insertUser(res, _userName,_email,userRecord.uid,_GUID,_role,_createDate);
                         }
                     });
-
-                },function(err){
-                    res.json({status:"failed", message:err.message});
-                });
-        })
-        .catch(function(err) {
-            if(err.code=='auth/email-already-in-use'){
-                res.json({status:"success", data:{status:"already-in-use"}});
-            }else{
-                res.json({status:"failed", message:err.message});
-            }
-        });
+                }
+            })
+            .catch(function (err) {
+                if (err.code == 'auth/email-already-in-use') {
+                    res.json({status: "success", data: {status: "already-in-use"}});
+                } else {
+                    res.json({status: "failed", message: err.message});
+                }
+            });
 }
 const deleteUser = function(res, uid){
     dexign_admin.auth().deleteUser(uid)
