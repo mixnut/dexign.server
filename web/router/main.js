@@ -44,7 +44,6 @@ router.route('/user')
 router.post("/user/validation", function (req,res) {
     controller.checkToken(req.body.uid, function(err,result){
         if(!err){
-            console.log(result);
             if(result=="success")
                 res.json({status:"success"});
             else
