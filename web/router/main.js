@@ -82,7 +82,13 @@ router.post("/signup", function (req,res){
                     }
                 });
             }else{
-                res.json({status:"success", data:{status: "pending", uid:_uid}});
+                if(req.body.role=='d')
+                    res.json({status:"success", data:{status:"pending" , uid:_uid}});
+                else{
+                    controller.getUserName(_uid,function(err,result){
+                        res.json({status:"success", data:{status:"success", uid:_uid, username:result}});
+                    });
+                }
             }
         })
         .catch(function(err) {
